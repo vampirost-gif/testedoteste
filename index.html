@@ -1,0 +1,121 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qual é o seu filme? — A Tela e o Tempo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--black:#100c09;--panel:#211713;--red:#98261f;--red2:#c43a2c;--gold:#d5a94f;--gold2:#f0cf78;--cream:#f5ead6;--muted:#c5b9a5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 15% 5%,#98261f38,transparent 25%),radial-gradient(circle at 85% 80%,#d5a94f20,transparent 28%),var(--black);color:var(--cream);font-family:"DM Sans",sans-serif}.top{height:6px;background:linear-gradient(90deg,var(--red),var(--gold2),var(--red))}
+.wrap{width:min(1000px,92%);margin:auto;padding:45px 0 80px}.brand{text-align:center;color:var(--gold2);font-size:11px;font-weight:700;letter-spacing:4px}.intro{text-align:center;max-width:760px;margin:28px auto 35px}.intro h1{font:700 clamp(42px,8vw,76px)/1 Cinzel,serif;margin:0}.intro h1 span{color:var(--gold2)}.intro p{color:var(--muted);line-height:1.7}.strip{height:27px;border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);margin:30px 0;background:repeating-linear-gradient(90deg,transparent 0 23px,var(--gold) 24px 28px,transparent 29px 48px);opacity:.55}
+.card{background:linear-gradient(145deg,#2a1b15,#15100d);border:1px solid #89672f;border-radius:17px;padding:27px;margin:20px 0;box-shadow:0 12px 30px #0008}.num{font-size:10px;letter-spacing:3px;color:var(--gold2);font-weight:700}.card h2{font:600 clamp(21px,4vw,29px) Cinzel,serif;margin:9px 0 20px}.options{display:grid;gap:10px}.option input{display:none}.option label{display:block;padding:15px 17px;border:1px solid #71352d;border-radius:10px;background:linear-gradient(90deg,#681c17,#321612);cursor:pointer;transition:.2s}.option label:hover{border-color:var(--gold2);transform:translateX(3px)}.option input:checked+label{background:linear-gradient(90deg,#a06b22,#76251e);border-color:var(--gold2);box-shadow:0 0 20px #d5a94f2b}
+.submitbox{text-align:center;margin:38px 0}.submit{padding:17px 30px;border:1px solid var(--gold2);border-radius:9px;background:linear-gradient(135deg,#ad3026,#751a15);color:#fff;font-weight:700;letter-spacing:2px;cursor:pointer}.warning{min-height:20px;margin-top:12px;color:#dfaa9d;font-size:13px}
+#loading,#result{display:none}.loading{text-align:center;padding:110px 10px}.reel{width:72px;height:72px;border:5px dotted var(--gold2);border-radius:50%;margin:auto auto 22px;animation:spin 1.8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.loading h2{font:600 25px Cinzel,serif;color:var(--gold2)}.loading p{color:var(--muted)}.progress{max-width:450px;height:5px;background:#38281d;margin:25px auto;overflow:hidden;border-radius:10px}.progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--red2),var(--gold2));animation:load 1.8s forwards}@keyframes load{to{width:100%}}
+.resulttag{display:inline-block;background:var(--red);border:1px solid var(--gold);padding:8px 14px;color:var(--gold2);font-size:10px;font-weight:700;letter-spacing:3px}.resultgrid{display:grid;grid-template-columns:1fr 350px;gap:45px;align-items:center;margin-top:30px}.result h1{font:700 clamp(40px,7vw,72px)/1 Cinzel,serif;color:var(--gold2);margin:15px 0 10px}.meta{color:var(--red2);font-weight:700;letter-spacing:1px;font-size:13px}.desc{color:#dfd2bd;line-height:1.75}.why{margin-top:25px;padding:18px 20px;border-left:3px solid var(--gold);background:#2b1a14}.why h3{font:600 18px Cinzel,serif;color:var(--gold2);margin:0 0 10px}.why p{margin:8px 0;color:#eadbc5}
+.poster{background:#eee4d1;padding:12px 12px 47px;transform:rotate(2deg);box-shadow:15px 18px 35px #000;position:relative}.poster:before{content:"";position:absolute;top:-12px;left:35%;width:30%;height:27px;background:#c6a86b;transform:rotate(-2deg)}.poster img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#111}.caption{position:absolute;bottom:13px;left:0;width:100%;text-align:center;color:#211a15;font:700 12px Cinzel,serif}.fact{margin-top:45px;padding:23px;border:1px solid #76582a;background:linear-gradient(120deg,#2b1b13,#17100d)}.fact strong{font-size:10px;letter-spacing:2px;color:var(--gold2)}.fact p{color:#d7c8b2;line-height:1.7;margin-bottom:0}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}.actions button{padding:13px 17px;border:1px solid var(--gold);border-radius:8px;background:#5d1d18;color:var(--cream);font-weight:700;cursor:pointer}
+@media(max-width:720px){.wrap{padding-top:35px}.resultgrid{grid-template-columns:1fr}.poster{width:min(310px,90%);margin:auto;order:-1}.card{padding:22px 17px}}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<main class="wrap">
+<section id="quiz">
+<div class="brand">🎞 A TELA E O TEMPO · QUIZ INTERATIVO</div>
+<div class="intro"><h1>Qual é o <span>seu filme?</span></h1><p>Responda às cinco perguntas de acordo com suas preferências. No final, descubra qual filme combina mais com você.</p></div>
+<div class="strip"></div>
+<form id="form">
+
+<div class="card"><div class="num">PERGUNTA 01 · DE 05</div><h2>Qual cenário mais te atrai?</h2><div class="options">
+<div class="option"><input id="q1a" name="q1" value="matrix" type="radio"><label for="q1a">A · Uma cidade futurista</label></div>
+<div class="option"><input id="q1b" name="q1" value="madmax" type="radio"><label for="q1b">B · Um mundo pós-apocalíptico</label></div>
+<div class="option"><input id="q1c" name="q1" value="casablanca" type="radio"><label for="q1c">C · Uma cidade cheia de mistérios</label></div>
+<div class="option"><input id="q1d" name="q1" value="2001" type="radio"><label for="q1d">D · O espaço</label></div>
+</div></div>
+
+<div class="card"><div class="num">PERGUNTA 02 · DE 05</div><h2>Que tipo de história você escolheria?</h2><div class="options">
+<div class="option"><input id="q2a" name="q2" value="starwars" type="radio"><label for="q2a">A · Uma grande aventura</label></div>
+<div class="option"><input id="q2b" name="q2" value="casablanca" type="radio"><label for="q2b">B · Uma história emocionante e clássica</label></div>
+<div class="option"><input id="q2c" name="q2" value="pulp" type="radio"><label for="q2c">C · Uma história cheia de reviravoltas</label></div>
+<div class="option"><input id="q2d" name="q2" value="eeaao" type="radio"><label for="q2d">D · Uma narrativa diferente de tudo</label></div>
+</div></div>
+
+<div class="card"><div class="num">PERGUNTA 03 · DE 05</div><h2>Qual estética combina mais com você?</h2><div class="options">
+<div class="option"><input id="q3a" name="q3" value="matrix" type="radio"><label for="q3a">A · Sombria e misteriosa</label></div>
+<div class="option"><input id="q3b" name="q3" value="toy" type="radio"><label for="q3b">B · Colorida e divertida</label></div>
+<div class="option"><input id="q3c" name="q3" value="pulp" type="radio"><label for="q3c">C · Marcante e estilosa</label></div>
+<div class="option"><input id="q3d" name="q3" value="madmax" type="radio"><label for="q3d">D · Intensa e caótica</label></div>
+</div></div>
+
+<div class="card"><div class="num">PERGUNTA 04 · DE 05</div><h2>O que mais chama sua atenção em um filme?</h2><div class="options">
+<div class="option"><input id="q4a" name="q4" value="avatar" type="radio"><label for="q4a">A · A fotografia e os visuais</label></div>
+<div class="option"><input id="q4b" name="q4" value="starwars" type="radio"><label for="q4b">B · Os personagens</label></div>
+<div class="option"><input id="q4c" name="q4" value="matrix" type="radio"><label for="q4c">C · A história e as ideias</label></div>
+<div class="option"><input id="q4d" name="q4" value="2001" type="radio"><label for="q4d">D · Os efeitos e a experiência visual</label></div>
+</div></div>
+
+<div class="card"><div class="num">PERGUNTA 05 · DE 05</div><h2>Escolha uma palavra:</h2><div class="options">
+<div class="option"><input id="q5a" name="q5" value="2001" type="radio"><label for="q5a">A · Sonho</label></div>
+<div class="option"><input id="q5b" name="q5" value="starwars" type="radio"><label for="q5b">B · Aventura</label></div>
+<div class="option"><input id="q5c" name="q5" value="matrix" type="radio"><label for="q5c">C · Tecnologia</label></div>
+<div class="option"><input id="q5d" name="q5" value="eeaao" type="radio"><label for="q5d">D · Liberdade</label></div>
+</div></div>
+
+<div class="submitbox"><button class="submit">ENVIAR RESPOSTAS →</button><div id="warning" class="warning"></div></div>
+</form>
+</section>
+
+<section id="loading"><div class="loading"><div class="reel"></div><h2>ANALISANDO SUAS ESCOLHAS...</h2><p>Consultando os arquivos da história do cinema.</p><div class="progress"><span></span></div></div></section>
+
+<section id="result">
+<div class="brand">🎬 RESULTADO DO QUIZ</div><div class="strip"></div>
+<span class="resulttag">SEU FILME É...</span>
+<div class="resultgrid"><div class="result"><h1 id="title"></h1><div id="meta" class="meta"></div><p id="desc" class="desc"></p><div class="why"><h3>✦ POR QUE COMBINA COM VOCÊ?</h3><div id="reasons"></div></div></div>
+<div class="poster"><img id="poster" alt=""><div id="caption" class="caption"></div></div></div>
+<div class="fact"><strong>🎞 VOCÊ SABIA?</strong><p id="fact"></p></div>
+<div class="actions"><button onclick="restart()">↻ REFAZER O QUIZ</button></div>
+</section>
+</main>
+
+<script>
+const films={
+matrix:{title:"Matrix",meta:"1999 · FICÇÃO CIENTÍFICA · WACHOWSKI",image:"https://i.postimg.cc/HJjQJKyD/IMG-5873.jpg",desc:"Você se conecta com histórias que questionam a realidade e exploram novas possibilidades. Curiosidade, tecnologia e ideias fazem parte do seu resultado.",reasons:["Você se interessa por tecnologia e novas possibilidades.","Gosta de histórias que fazem questionar a realidade.","Prefere narrativas com ideias que continuam na cabeça depois do filme."],fact:"Matrix tornou-se um marco da ficção científica contemporânea e ficou especialmente conhecido por suas inovações visuais e conceituais."},
+madmax:{title:"Mad Max: Estrada da Fúria",meta:"2015 · AÇÃO · GEORGE MILLER",image:"https://i.postimg.cc/Ff1jfqL4/IMG-5876.jpg",desc:"Você parece gostar de intensidade, movimento e mundos extremos. Aqui, a narrativa é conduzida por ação, ritmo e uma identidade visual muito forte.",reasons:["Você escolhe experiências intensas e cheias de movimento.","Gosta de visuais marcantes e muita ação.","Prefere histórias que prendem sua atenção do começo ao fim."],fact:"O filme ficou conhecido pelo uso de efeitos práticos e por sua construção visual extremamente detalhada."},
+casablanca:{title:"Casablanca",meta:"1942 · DRAMA · MICHAEL CURTIZ",image:"https://i.postimg.cc/K10P8F4N/IMG-5861.jpg",desc:"Seu resultado aponta para um gosto por histórias clássicas, personagens marcantes e emoções que permanecem mesmo depois dos créditos.",reasons:["Você valoriza personagens e relações humanas.","Gosta de histórias emocionantes e atemporais.","Uma atmosfera clássica chama sua atenção."],fact:"Casablanca se tornou um dos títulos mais reconhecidos da chamada Era de Ouro de Hollywood."},
+"2001":{title:"2001: Uma Odisseia no Espaço",meta:"1968 · FICÇÃO CIENTÍFICA · STANLEY KUBRICK",image:"https://i.postimg.cc/Wd5G1jt5/IMG-5866.jpg",desc:"Você parece ter curiosidade sobre o desconhecido. 2001 combina tecnologia, espaço e uma experiência visual que convida o público a interpretar o que está vendo.",reasons:["Você se interessa pelo espaço e pelo desconhecido.","Gosta de experiências visuais e contemplativas.","Prefere obras que deixam perguntas para pensar."],fact:"2001 é reconhecido por seu trabalho de efeitos visuais e por sua influência na ficção científica cinematográfica."},
+starwars:{title:"Star Wars",meta:"1977 · AVENTURA / FICÇÃO CIENTÍFICA · GEORGE LUCAS",image:"https://i.postimg.cc/75K3ZDfr/IMG-5869.jpg",desc:"Aventura, personagens e universos grandiosos parecem ser a sua combinação ideal. Você gosta de entrar em mundos que continuam além da tela.",reasons:["Você gosta de grandes aventuras.","Personagens e universos fantásticos chamam sua atenção.","Você valoriza histórias que criam uma experiência completa."],fact:"Star Wars ajudou a transformar o cinema de grande espetáculo e tornou-se uma das franquias mais influentes da cultura pop."},
+pulp:{title:"Pulp Fiction",meta:"1994 · CRIME / DRAMA · QUENTIN TARANTINO",image:"https://i.postimg.cc/v1DW1j6j/IMG-5871.jpg",desc:"Você parece gostar de histórias com personalidade. Narrativas não lineares, diálogos marcantes e escolhas estilísticas fazem parte desse resultado.",reasons:["Você gosta de narrativas fora do padrão.","Estilo e personalidade são importantes para você.","Você aprecia histórias que surpreendem."],fact:"Pulp Fiction ficou conhecido por sua narrativa não linear e por sua influência no cinema independente e contemporâneo."},
+eeaao:{title:"Tudo em Todo o Lugar ao Mesmo Tempo",meta:"2022 · COMÉDIA / DRAMA / FANTASIA · DANIELS",image:"https://i.postimg.cc/R3qc38Hm/IMG-5878.jpg",desc:"Você parece gostar de criatividade sem limites. Mistura de gêneros, universos e ideias inesperadas fazem parte da experiência desse filme.",reasons:["Você gosta de histórias completamente diferentes.","Criatividade e liberdade são importantes para você.","Você não se importa quando um filme quebra expectativas."],fact:"O filme combina diferentes gêneros e estruturas narrativas para criar uma experiência cinematográfica bastante singular."},
+toy:{title:"Toy Story",meta:"1995 · ANIMAÇÃO · JOHN LASSETER",image:"https://i.postimg.cc/RWg7Z9Nz/IMG-5872.jpg",desc:"Seu resultado aponta para uma personalidade que valoriza criatividade, emoção e histórias que conseguem ser divertidas e significativas ao mesmo tempo.",reasons:["Você gosta de histórias criativas e divertidas.","Personagens cativantes são importantes para você.","Você aprecia filmes que conseguem emocionar."],fact:"Toy Story foi o primeiro longa-metragem totalmente produzido com animação por computador."},
+avatar:{title:"Avatar",meta:"2009 · FICÇÃO CIENTÍFICA · JAMES CAMERON",image:"https://i.postimg.cc/5XsB216f/IMG-5874.jpg",desc:"Seu resultado mostra uma forte conexão com experiências visuais e mundos imaginativos. Você gosta de entrar em um universo completamente diferente.",reasons:["A estética visual tem grande importância para você.","Você gosta de mundos imaginativos e detalhados.","Novas experiências e tecnologias chamam sua atenção."],fact:"Avatar chamou atenção pelo desenvolvimento de tecnologias e técnicas digitais utilizadas para criar o mundo de Pandora."}
+};
+
+document.getElementById("form").addEventListener("submit",e=>{
+ e.preventDefault();
+ const qs=["q1","q2","q3","q4","q5"], scores={}; let missing=false;
+ qs.forEach(q=>{const x=document.querySelector('input[name="'+q+'"]:checked');if(!x)missing=true;else scores[x.value]=(scores[x.value]||0)+2});
+ if(missing){document.getElementById("warning").textContent="✦ Responda todas as perguntas antes de enviar.";return}
+ const tie=Object.keys(scores).filter(k=>scores[k]===Math.max(...Object.values(scores)));
+ const winner=tie[Math.floor(Math.random()*tie.length)];
+ document.getElementById("quiz").style.display="none";
+ document.getElementById("loading").style.display="block";
+ setTimeout(()=>show(winner),1800);
+});
+function show(k){
+ const f=films[k];
+ document.getElementById("loading").style.display="none";
+ document.getElementById("result").style.display="block";
+ title.textContent=f.title;meta.textContent=f.meta;desc.textContent=f.desc;poster.src=f.image;poster.alt="Pôster de "+f.title;caption.textContent=f.title;fact.textContent=f.fact;
+ reasons.innerHTML=f.reasons.map(x=>"<p>✦ "+x+"</p>").join("");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function restart(){document.getElementById("result").style.display="none";document.getElementById("quiz").style.display="block";document.getElementById("form").reset();document.getElementById("warning").textContent="";window.scrollTo({top:0,behavior:"smooth"})}
+</script>
+</body>
+</html>'''
+
+path=Path("/mnt/data/index.html")
+path.write_text(html,encoding="utf-8")
+print(f"Arquivo criado: {path}")
